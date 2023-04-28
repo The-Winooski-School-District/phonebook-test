@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.CSVImporter_FileSelector {
+  margin: auto auto auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 60% !important;
+  border: 3px dashed rgba(0, 0, 0, 0.603) !important;
+  border-radius: 10px !important;
+  background-color: #1d341d83 !important;
+  transition: background-color 0.3s ease-in-out !important;
+}
+
+.CSVImporter_FileSelector:hover {
+  background-color: #17291786 !important;
+}
+
