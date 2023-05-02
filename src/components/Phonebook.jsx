@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import { db } from "./Firebase";
 import { Importer, ImporterField } from "react-csv-importer";
 import { CSVLink } from "react-csv";
-import CSVReader from "react-csv-reader";
+/*import CSVReader from "react-csv-reader";*/
 
 function Phonebook() {
   const [contacts, setContacts] = useState([]);
   const [loadedData, setLoadedData] = useState([]);
 
+  const seasonid = "-NUSSOwaaO4GYX8K9twl";
+
   useEffect(() => {
-    const phonebookRef = db.ref("z_phonebook-test");
+    const phonebookRef = db.ref(`seasons/${seasonid}/teams`);
     phonebookRef.on("value", (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -26,18 +28,33 @@ function Phonebook() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newContact = {
+      teamId: teamId,
       name: name,
-      phone: phone,
+      abbr: abbr,
+      teamPage: teamPage,
+      teamPic: teamPic,
+      coaches: coaches,
+      multi: multi
     };
-    db.ref("z_phonebook-test").push(newContact);
+    db.ref(`seasons/${seasonid}/teams`).push(newContact);
+    setTeamId("");
     setName("");
-    setPhone("");
+    setAbbr("");
+    setTeamPage("");
+    setTeamPic("");
+    setCoaches("");
+    setMulti("");
   };
 
-  const handleFileLoaded = (data, fileInfo) => {
+  /*const handleFileLoaded = (data, fileInfo) => {
     const newContacts = data.map((row) => ({
+      teamId: row.TeamId,
       name: row.Name,
-      phone: row.Phone,
+      abbr: row.Abbr,
+      teamPage: row.TeamPage,
+      teamPic: row.TeamPic,
+      coaches: row.Coaches,
+      multi: row.Multi
     }));
     const uniqueNewContacts = newContacts.filter((newContact) => {
       let found = false;
@@ -45,10 +62,14 @@ function Phonebook() {
         const loadedContact = loadedData[i];
         if (
           loadedContact &&
+          loadedContact.teamId &&
           loadedContact.name &&
-          loadedContact.phone &&
-          loadedContact.name === newContact.name &&
-          loadedContact.phone === newContact.phone
+          loadedContact.abbr &&
+          loadedContact.teamPage &&
+          loadedContact.teamPic &&
+          loadedContact.coaches &&
+          loadedContact.multi &&
+          loadedContact.name === newContact.name
         ) {
           found = true;
           break;
@@ -59,25 +80,30 @@ function Phonebook() {
     if (uniqueNewContacts.length === 0) {
       alert("The file you uploaded contains only duplicates.");
     } else {
-      const phonebookRef = db.ref("z_phonebook-test");
-      uniqueNewContacts.forEach((newContact) => {
-        phonebookRef.push(newContact);
-      });
       setContacts([...contacts, ...uniqueNewContacts]);
     }
-  };
+  };*/
   
-
+  const [teamId, setTeamId] = useState("");
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [abbr, setAbbr] = useState("");
+  const [teamPage, setTeamPage] = useState("");
+  const [teamPic, setTeamPic] = useState("");
+  const [coaches, setCoaches] = useState("");
+  const [multi, setMulti] = useState("");
 
-  const csvData = contacts.map(({ name, phone }) => ({ name, phone }));
+  const csvData = contacts.map(({ teamId, name, abbr, teamPage, teamPic, coaches, multi }) => ({ teamId, name, abbr, teamPage, teamPic, coaches, multi }));
 
   const handleData = async (rows, { startIndex }) => {
     try {
       const newContacts = rows.map((row) => ({
+        teamId: row.teamId,
         name: row.name,
-        phone: row.phone,
+        abbr: row.abbr,
+        teamPage: row.teamPage,
+        teamPic: row.teamPic,
+        coaches: row.coaches,
+        multi: row.multi
       }));
       if (newContacts.length > 0) {
         const uniqueNewContacts = newContacts.filter(
@@ -85,22 +111,26 @@ function Phonebook() {
             !loadedData.find(
               (loadedContact) =>
                 loadedContact &&
+                loadedContact.teamId &&
                 loadedContact.name &&
-                loadedContact.phone &&
+                loadedContact.abbr &&
+                loadedContact.teamPage &&
+                loadedContact.teamPic &&
+                loadedContact.coaches &&
+                loadedContact.multi &&
                 loadedContact.name.toLowerCase() ===
-                  newContact.name.toLowerCase() &&
-                loadedContact.phone === newContact.phone
+                    newContact.name.toLowerCase()
             )
         );
         if (uniqueNewContacts.length === 0) {
           alert("The file you uploaded contains only duplicates.");
         } else {
-          const phonebookRef = db.ref("z_phonebook-test");
+          const phonebookRef = db.ref(`seasons/${seasonid}/teams`);
           uniqueNewContacts.forEach((newContact) => {
             phonebookRef.push(newContact);
           });
           setContacts([...contacts, ...uniqueNewContacts]);
-          setLoadedData([...loadedData, newContacts[0]]);
+          setLoadedData([...loadedData, ...newContacts]);
         }
       }
     } catch (error) {
@@ -112,6 +142,14 @@ function Phonebook() {
     <div>
       <form onSubmit={handleSubmit}>
         <label>
+          team id:
+          <input
+            type="text"
+            value={teamId}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
+        <label>
           Name:
           <input
             type="text"
@@ -120,11 +158,43 @@ function Phonebook() {
           />
         </label>
         <label>
-          Phone:
+          Abbr:
+          <input
+            type="text"
+            value={abbr}
+            onChange={(e) => setAbbr(e.target.value)}
+          />
+        </label>
+        <label>
+          Page:
+          <input
+            type="text"
+            value={teamPage}
+            onChange={(e) => setTeamPage(e.target.value)}
+          />
+        </label>
+        <label>
+          Pic:
+          <input
+            type="text"
+            value={teamPic}
+            onChange={(e) => setTeamPic(e.target.value)}
+          />
+        </label>
+        <label>
+          coaches:
+          <input
+            type="text"
+            value={coaches}
+            onChange={(e) => setCoaches(e.target.value)}
+          />
+        </label>
+        <label>
+          Multi:
           <input
             type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={multi}
+            onChange={(e) => setMulti(e.target.value)}
           />
         </label>
         <button type="submit">Add Contact</button>
@@ -135,8 +205,13 @@ function Phonebook() {
         onError={(err) => console.log(err)}
         dataHandler={handleData}
       >
+        <ImporterField name="teamId" label="Team Id" />
         <ImporterField name="name" label="Name" />
-        <ImporterField name="phone" label="Phone" />
+        <ImporterField name="abbr" label="Abbr" />
+        <ImporterField name="teamPage" label="TeamPage" />
+        <ImporterField name="teamPic" label="TeamPic" />
+        <ImporterField name="coaches" label="Coaches" />
+        <ImporterField name="multi" label="Multi" />
       </Importer>
       <button
         onClick={() => {
@@ -146,6 +221,7 @@ function Phonebook() {
       >
         Upload CSV
       </button>
+      {/*}
       <CSVReader
         onFileLoaded={handleFileLoaded}
         inputStyle={{ display: "none" }}
@@ -155,18 +231,29 @@ function Phonebook() {
           skipEmptyLines: true,
         }}
       />
+      */}
       <table>
         <thead>
           <tr>
+            <th>Team Id</th>
             <th>Name</th>
-            <th>Phone</th>
+            <th>abbr</th>
+            <th>page</th>
+            <th>pic</th>
+            <th>coaches</th>
+            <th>multi</th>
           </tr>
         </thead>
         <tbody>
           {contacts.map((contact) => (
             <tr key={contact.id}>
+              <td>{contact.teamId}</td>
               <td>{contact.name}</td>
-              <td>{contact.phone}</td>
+              <td>{contact.abbr}</td>
+              <td>{contact.teamPage}</td>
+              <td>{contact.teamPic}</td>
+              <td>{contact.coaches}</td>
+              <td>{contact.multi}</td>
             </tr>
           ))}
         </tbody>
