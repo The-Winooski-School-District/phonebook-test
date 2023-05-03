@@ -39,47 +39,55 @@ function TeamFinderAndScheduleAdder() {
   const handleData = async (data, { startIndex }) => {
     console.log("Loop starting...");
     try {
-      const newPlayers = data.filter(
-        (player) =>
+      const newSchedules = data.filter(
+        (schedule) =>
           !loadedData.find(
             (loadedPlayer) =>
-              loadedPlayer.teamId === player.teamId &&
-              loadedPlayer.fName === player.fName &&
-              loadedPlayer.lName === player.lName &&
-              loadedPlayer.grade === player.grade &&
-              loadedPlayer.number === player.number &&
-              loadedPlayer.position === player.position &&
-              loadedPlayer.multi === player.multi &&
-              loadedPlayer.captain === player.captain
+            loadedPlayer.teamId === schedule.teamId &&
+            loadedPlayer.opponent === schedule.opponent &&
+            loadedPlayer.home === schedule.home &&
+            loadedPlayer.address === schedule.address &&
+            loadedPlayer.number === schedule.number &&
+            loadedPlayer.date === schedule.date &&
+            loadedPlayer.date2 === schedule.date2 &&
+            loadedPlayer.w_score === schedule.w_score &&
+            loadedPlayer.w_score2 === schedule.w_score2 &&
+            loadedPlayer.o_score === schedule.o_score &&
+            loadedPlayer.o_score2 === schedule.o_score2 &&
+            loadedPlayer.notes === schedule.notes
           )
       );
-      setLoadedData(loadedData.concat(newPlayers));
+      setLoadedData(loadedData.concat(newSchedules));
   
       const promises = [];
       for (const season of seasons) {
         for (let team in season.teams) {
-          const rosterRef = db.ref(`seasons/${season.id}/teams/${team}/roster`);
-          const teamPlayers = newPlayers.filter(
-            (player) => player.teamId === season.teams[team].teamId
+          const scheduleRef = db.ref(`seasons/${season.id}/teams/${team}/schedule`);
+          const teamSchedule = newSchedules.filter(
+            (schedule) => schedule.teamId === season.teams[team].teamId
           );
-          if (teamPlayers.length > 0) {
+          if (teamSchedule.length > 0) {
             promises.push(
-              rosterRef.once("value").then((snapshot) => {
-                const existingRoster = snapshot.val() || [];
-                const newRoster = existingRoster.concat(teamPlayers.filter(
-                  (player) => !existingRoster.some(
-                    (existingPlayer) =>
-                      existingPlayer.teamId === player.teamId &&
-                      existingPlayer.fName === player.fName &&
-                      existingPlayer.lName === player.lName &&
-                      existingPlayer.grade === player.grade &&
-                      existingPlayer.number === player.number &&
-                      existingPlayer.position === player.position &&
-                      existingPlayer.multi === player.multi &&
-                      existingPlayer.captain === player.captain
+                scheduleRef.once("value").then((snapshot) => {
+                const existingSchedule = snapshot.val() || [];
+                const newSchedule = existingSchedule.concat(teamSchedule.filter(
+                  (schedule) => !existingSchedule.some(
+                    (existingSchedule) =>
+                    existingSchedule.teamId === schedule.teamId &&
+                    existingSchedule.opponent === schedule.opponent &&
+                    existingSchedule.home === schedule.home &&
+                    existingSchedule.address === schedule.address &&
+                    existingSchedule.number === schedule.number &&
+                    existingSchedule.date === schedule.date &&
+                    existingSchedule.date2 === schedule.date2 &&
+                    existingSchedule.w_score === schedule.w_score &&
+                    existingSchedule.w_score2 === schedule.w_score2 &&
+                    existingSchedule.o_score === schedule.o_score &&
+                    existingSchedule.o_score2 === schedule.o_score2 &&
+                    existingSchedule.notes === schedule.notes
                   )
                 ));
-                return rosterRef.set(newRoster);
+                return scheduleRef.set(newSchedule);
               })
             );
           }
@@ -108,13 +116,17 @@ function TeamFinderAndScheduleAdder() {
         dataHandler={handleData}
       >
         <ImporterField name="teamId" label="Team ID" />
-        <ImporterField name="fName" label="FName" />
-        <ImporterField name="lName" label="LName" />
-        <ImporterField name="grade" label="Grade" />
-        <ImporterField name="number" label="Number" />
-        <ImporterField name="position" label="Position" />
-        <ImporterField name="multi" label="Team(s)" />
-        <ImporterField name="captain" label="Captain" />
+        <ImporterField name="opponent" label="Opponent ID" />
+        <ImporterField name="home" label="Home" />
+        <ImporterField name="address" label="Address" />
+        <ImporterField name="date" label="Date" />
+        <ImporterField name="date2" label="Date2" />
+        <ImporterField name="w_score" label="w_score" />
+        <ImporterField name="w_score2" label="w_score2" />
+        <ImporterField name="o_score" label="o_score" />
+        <ImporterField name="o_score2" label="o_score2" />
+        <ImporterField name="notes" label="Notes" />
+
       </Importer>
       <button
         onClick={() => {
@@ -128,13 +140,16 @@ function TeamFinderAndScheduleAdder() {
         <thead>
           <tr>
             <th>teamId</th>
-            <th>fName</th>
-            <th>lName</th>
-            <th>grade</th>
-            <th>number</th>
-            <th>position</th>
-            <th>multi</th>
-            <th>captain</th>
+            <th>Opponent</th>
+            <th>Home</th>
+            <th>Address</th>
+            <th>Date</th>
+            <th>Date2</th>
+            <th>w_score</th>
+            <th>w_score2</th>
+            <th>o_score</th>
+            <th>o_score2</th>
+            <th>notes</th>
           </tr>
         </thead>
         <tbody>
