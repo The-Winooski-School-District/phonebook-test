@@ -7,13 +7,30 @@ import CSVReader from "react-csv-reader";*/
 function TeamFinderAndScheduleAdder() {
   const [seasons, setSeasons] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [opponents, setOpponents] = useState([]);
   const [loadedData, setLoadedData] = useState([]);
 
-  if (!teams) {
+  if (!teams && !opponents) {
     /*do nothing*/
   }
 
   useEffect(() => {
+    const opponentsRef = db.ref("opponents");
+    opponentsRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const opponentsArray = Object.entries(data).map(([key, value]) => {
+          return { id: key, ...value };
+        });
+        setOpponents(opponentsArray);
+        // fetch the oppId from the opponents array
+        for (const opponent in opponentsArray) {
+          console.log(opponentsArray[opponent].oppId); //important
+          console.log(opponentsArray[opponent].name); //important?!
+        }
+      }
+    });
+
     const seasonsRef = db.ref("seasons");
     seasonsRef.on("value", (snapshot) => {
       const data = snapshot.val();
@@ -39,72 +56,84 @@ function TeamFinderAndScheduleAdder() {
   const handleData = async (data, { startIndex }) => {
     console.log("Loop starting...");
     try {
+      const opponentsMap = new Map(
+        opponents.map(({ oppId, name }) => [oppId, name])
+      ); // create a map of oppId -> name
+      data = data.map((schedule) => ({
+        ...schedule,
+        opponent: opponentsMap.get(schedule.opponent),
+      })); // replace Opponent ID with name
       const newSchedules = data.filter(
         (schedule) =>
           !loadedData.find(
             (loadedPlayer) =>
-            loadedPlayer.teamId === schedule.teamId &&
-            loadedPlayer.opponent === schedule.opponent &&
-            loadedPlayer.home === schedule.home &&
-            loadedPlayer.address === schedule.address &&
-            loadedPlayer.number === schedule.number &&
-            loadedPlayer.date === schedule.date &&
-            loadedPlayer.date2 === schedule.date2 &&
-            loadedPlayer.w_score === schedule.w_score &&
-            loadedPlayer.w_score2 === schedule.w_score2 &&
-            loadedPlayer.o_score === schedule.o_score &&
-            loadedPlayer.o_score2 === schedule.o_score2 &&
-            loadedPlayer.notes === schedule.notes
+              loadedPlayer.teamId === schedule.teamId &&
+              loadedPlayer.opponent === schedule.opponent &&
+              loadedPlayer.home === schedule.home &&
+              loadedPlayer.address === schedule.address &&
+              loadedPlayer.number === schedule.number &&
+              loadedPlayer.date === schedule.date &&
+              loadedPlayer.date2 === schedule.date2 &&
+              loadedPlayer.w_score === schedule.w_score &&
+              loadedPlayer.w_score2 === schedule.w_score2 &&
+              loadedPlayer.o_score === schedule.o_score &&
+              loadedPlayer.o_score2 === schedule.o_score2 &&
+              loadedPlayer.notes === schedule.notes
           )
       );
       setLoadedData(loadedData.concat(newSchedules));
-  
+
       const promises = [];
       for (const season of seasons) {
         for (let team in season.teams) {
-          const scheduleRef = db.ref(`seasons/${season.id}/teams/${team}/schedule`);
+          const scheduleRef = db.ref(
+            `seasons/${season.id}/teams/${team}/schedule`
+          );
           const teamSchedule = newSchedules.filter(
             (schedule) => schedule.teamId === season.teams[team].teamId
           );
           if (teamSchedule.length > 0) {
             promises.push(
-                scheduleRef.once("value").then((snapshot) => {
+              scheduleRef.once("value").then((snapshot) => {
                 const existingSchedule = snapshot.val() || [];
-                const newSchedule = existingSchedule.concat(teamSchedule.filter(
-                  (schedule) => !existingSchedule.some(
-                    (existingSchedule) =>
-                    existingSchedule.teamId === schedule.teamId &&
-                    existingSchedule.opponent === schedule.opponent &&
-                    existingSchedule.home === schedule.home &&
-                    existingSchedule.address === schedule.address &&
-                    existingSchedule.number === schedule.number &&
-                    existingSchedule.date === schedule.date &&
-                    existingSchedule.date2 === schedule.date2 &&
-                    existingSchedule.w_score === schedule.w_score &&
-                    existingSchedule.w_score2 === schedule.w_score2 &&
-                    existingSchedule.o_score === schedule.o_score &&
-                    existingSchedule.o_score2 === schedule.o_score2 &&
-                    existingSchedule.notes === schedule.notes
+                const newSchedule = existingSchedule.concat(
+                  teamSchedule.filter(
+                    (schedule) =>
+                      !existingSchedule.some(
+                        (existingSchedule) =>
+                          existingSchedule.teamId === schedule.teamId &&
+                          existingSchedule.opponent === schedule.opponent &&
+                          existingSchedule.home === schedule.home &&
+                          existingSchedule.address === schedule.address &&
+                          existingSchedule.number === schedule.number &&
+                          existingSchedule.date === schedule.date &&
+                          existingSchedule.date2 === schedule.date2 &&
+                          existingSchedule.w_score === schedule.w_score &&
+                          existingSchedule.w_score2 === schedule.w_score2 &&
+                          existingSchedule.o_score === schedule.o_score &&
+                          existingSchedule.o_score2 === schedule.o_score2 &&
+                          existingSchedule.notes === schedule.notes
+                      )
                   )
-                ));
+                );
                 return scheduleRef.set(newSchedule);
               })
             );
           }
         }
       }
-  
-      Promise.all(promises).then(() => {
-        console.log("All updates complete");
-      }).catch((error) => {
-        console.error("Error updating database:", error);
-      });
+
+      Promise.all(promises)
+        .then(() => {
+          console.log("All updates complete");
+        })
+        .catch((error) => {
+          console.error("Error updating database:", error);
+        });
     } catch (error) {
       console.log(error);
     }
   };
-  
-  
 
   return (
     <div>
@@ -126,7 +155,6 @@ function TeamFinderAndScheduleAdder() {
         <ImporterField name="o_score" label="o_score" />
         <ImporterField name="o_score2" label="o_score2" />
         <ImporterField name="notes" label="Notes" />
-
       </Importer>
       <button
         onClick={() => {
