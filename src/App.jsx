@@ -1,12 +1,14 @@
 import "./App.css";
-import Phonebook from "./components/Phonebook";
-import TeamFinderAndDetailAdder from "./components/TeamFinderAndDetailAdder";
+/*import Phonebook from "./components/Phonebook";
+import TeamFinderAndRosterAdder from "./components/TeamFinderAndRosterAdder";*/
+import TeamFinderAndScheduleAdder from "./components/TeamFinderAndScheduleAdder";
 
 function App() {
   return (
     <div>
-      <Phonebook />
-      <TeamFinderAndDetailAdder />
+      <TeamFinderAndScheduleAdder /> 
+      {/*<TeamFinderAndRosterAdder />
+      <Phonebook />*/}
     </div>
   );
 }

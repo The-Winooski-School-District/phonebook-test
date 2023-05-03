@@ -4,7 +4,7 @@ import { Importer, ImporterField } from "react-csv-importer";
 /*import { CSVLink } from "react-csv";
 import CSVReader from "react-csv-reader";*/
 
-function TeamFinderAndDetailAdder() {
+function TeamFinderAndRosterAdder() {
   const [seasons, setSeasons] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loadedData, setLoadedData] = useState([]);
@@ -100,6 +100,7 @@ function TeamFinderAndDetailAdder() {
 
   return (
     <div>
+      <h1>ADD ROSTER</h1>
       <Importer
         className="drag-n-drop"
         delimiter=","
@@ -150,4 +151,4 @@ function TeamFinderAndDetailAdder() {
   );
 }
 
-export default TeamFinderAndDetailAdder;
+export default TeamFinderAndRosterAdder;

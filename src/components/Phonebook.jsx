@@ -109,7 +109,7 @@ function Phonebook() {
   return (
     <div>
       <div>
-        <p>This is where I'll prove I have the current season/team/ to add a schedule or roster. The table below should show the schedule or roster added</p>
+      <h1>ADD ENTRY</h1>
       </div>
       <form onSubmit={handleSubmit}>
         <label>
