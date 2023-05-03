@@ -9,6 +9,10 @@ function TeamFinderAndDetailAdder() {
   const [teams, setTeams] = useState([]);
   const [loadedData, setLoadedData] = useState([]);
 
+  if (!teams) {
+    /*do nothing*/
+  }
+
   useEffect(() => {
     const seasonsRef = db.ref("seasons");
     seasonsRef.on("value", (snapshot) => {
