@@ -73,7 +73,9 @@ function TeamFinderAndScheduleAdder() {
               loadedPlayer.address === schedule.address &&
               loadedPlayer.number === schedule.number &&
               loadedPlayer.date === schedule.date &&
+              loadedPlayer.time === schedule.time &&
               loadedPlayer.date2 === schedule.date2 &&
+              loadedPlayer.time2 === schedule.time2 &&
               loadedPlayer.w_score === schedule.w_score &&
               loadedPlayer.w_score2 === schedule.w_score2 &&
               loadedPlayer.o_score === schedule.o_score &&
@@ -107,7 +109,9 @@ function TeamFinderAndScheduleAdder() {
                           existingSchedule.address === schedule.address &&
                           existingSchedule.number === schedule.number &&
                           existingSchedule.date === schedule.date &&
+                          existingSchedule.time === schedule.time &&
                           existingSchedule.date2 === schedule.date2 &&
+                          existingSchedule.time2 === schedule.time2 &&
                           existingSchedule.w_score === schedule.w_score &&
                           existingSchedule.w_score2 === schedule.w_score2 &&
                           existingSchedule.o_score === schedule.o_score &&
@@ -149,7 +153,9 @@ function TeamFinderAndScheduleAdder() {
         <ImporterField name="home" label="Home" />
         <ImporterField name="address" label="Address" />
         <ImporterField name="date" label="Date" />
+        <ImporterField name="time" label="Time" />
         <ImporterField name="date2" label="Date2" />
+        <ImporterField name="time2" label="Time2" />
         <ImporterField name="w_score" label="w_score" />
         <ImporterField name="w_score2" label="w_score2" />
         <ImporterField name="o_score" label="o_score" />
@@ -172,7 +178,9 @@ function TeamFinderAndScheduleAdder() {
             <th>Home</th>
             <th>Address</th>
             <th>Date</th>
+            <th>Time</th>
             <th>Date2</th>
+            <th>Time2</th>
             <th>w_score</th>
             <th>w_score2</th>
             <th>o_score</th>
